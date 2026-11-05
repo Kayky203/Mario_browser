@@ -8,3 +8,8 @@ export default function loadImage(url){ // funcao de carregamento de imagem
         image.src = url //atribui a imagem carregada
     })
 }
+
+export function loadLevel(name){
+    return fetch(`/levels/${name}.json`) //busca o level baseado na resposta da main
+    .then(r => r.json());
+}

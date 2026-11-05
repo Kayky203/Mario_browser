@@ -18,7 +18,7 @@
             y * this.height, // e faz o recorte da maneira correta
         this.width, // quanto recortar na horizontal
         this.height,// vertical
-        0,0, //onde colocar no buffer no caso canto superior esquerdo
+        0,0,        //onde colocar no buffer no caso canto superior esquerdo
         this.width, //largura da colagem
         this.height //altura da colagem
     )
@@ -27,5 +27,10 @@
     draw (name,context, x,y){ //desenha o o tile com a largura e altura correta
         const buffer = this.tiles.get(name) //busca o tile guardado pelo nome
         context.drawImage(buffer,x,y); // copia o tile para o canva na tela
+    }
+
+    drawTile(name,context,x,y){
+        this.draw(name,context, x * this.width, y * this.height)
+        //desenha o tile usando a posicao na grade coluna e linha 
     }
 }
