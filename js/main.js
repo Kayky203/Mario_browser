@@ -18,27 +18,53 @@ function drawBackground(background, context, sprites){
     
     }); 
 
-}                       
-const canvas = document.getElementById('screen'); //pegando o canva no html
-const context = canvas.getContext('2d'); //criando contexto para que possa ser desenho
+}         
 
 
-
-loadImage('/img/tiles.png').then(image =>{ //enviando a imagem para promise
+function loadMauroSprites(){
+    
+   return loadImage('/img/sprites.png').then(image =>{ //enviando a imagem para promise
     const sprites = new SpriteSheet(image,16,16)
 
     //definindo as sprites
-    sprites.define('ground',0,0) // nome do sprite posicao x no tile e altura y no tile
-    sprites.define("sky",3,23)
+    sprites.define('idle',0,88,14,16) // sprite mauro parado
+
+    return sprites; //retornando a instancia de sprites
+   })
+}
+
+
+function loadBackgroundSprites(){
     
-    loadLevel('1-1') //chama a sprite que precisa ser carregada
-    .then(level => {
-        console.log("nivel 1")
-        level.backgrounds.forEach(background => {
+   return loadImage('/img/tiles.png').then(image =>{ //enviando a imagem para promise
+    const sprites = new SpriteSheet(image,16,16)
+
+    //definindo as sprites
+    sprites.defineTile('ground',0,0) // nome do sprite posicao x no tile e altura y no tile
+    sprites.defineTile("sky",3,23)
+
+    return sprites; //retornando a instancia de sprites
+   })
+}
+    const canvas = document.getElementById('screen'); //pegando o canva no html
+    const context = canvas.getContext('2d'); //criando contexto para que possa ser desenho
+
+   Promise.all([ //carrega as duas coisas em pararelo
+    loadMauroSprites(),
+    loadBackgroundSprites(),
+    loadLevel('1-1')])
+
+    .then(([mauroSprite,sprites,level]) => { //roda quando termina de carregar
+      console.log("nivel 1")
+        level.backgrounds.forEach(background => { 
 
             drawBackground(background, context, sprites)
         });
-    })
+        mauroSprite.draw('idle',context,64,64)
+   } )
+
+
+
 
     
 
@@ -48,6 +74,6 @@ loadImage('/img/tiles.png').then(image =>{ //enviando a imagem para promise
     //   16,16, // larguraS, alturaS tamanho do recorte
     //   32,32, // larguraD, alturaD onde desenhar no canva
     //   16,16) // dLargura, dAltura: tamanho no canvas
-})
+
 
 
