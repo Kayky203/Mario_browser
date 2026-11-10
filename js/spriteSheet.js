@@ -14,17 +14,16 @@
         buffer.height = height // 16 altura
         buffer.width = width // 16 largura
         buffer.getContext('2d').drawImage(this.image, 
-            x,
-            y,
-        width,      // quanto recortar na horizontal
-        height,// vertical
-        0,0,        //onde colocar no buffer no caso canto superior esquerdo
-        width,      //largura da colagem
-        height      //altura da colagem
+        x,y,            //x e y onde o recorte comeca
+        width,height,   //quanto recortar
+        0,0,            //onde colocar no buffer
+        width,          //largura da colagem
+        height          //altura da colagem
     )
         this.tiles.set(name,buffer) //guarda o nome do tile recortado no map
     }
-
+// atalho para tiles em grade converte coluna/linha em pixels
+// e recorta com o tamanho padrao do tile (this.width x this.height)
     defineTile(name,x,y){
         this.define(name, x * this.width,y *this.height, this.width, this.height)
     }

@@ -1,13 +1,14 @@
-import SpriteSheet from "./sprite.js"    //import da funcao de sprite
-import loadImage, {loadLevel} from "./loaders.js"
-
+import {loadLevel} from "./loaders.js"
+import { loadMauroSprites, loadBackgroundSprites } from "./sprites.js";
+import Compositor from "./Compositor.js";
+import { createBackgroundLayer } from "./layers.js";
 
 //pega o fundo de um json e desenha no canva
 function drawBackground(background, context, sprites){
 
     //percorrendo os intervalos pra preencher o fundo
     background.ranges.forEach(([x1, x2, y1, y2]) => {
-    // 0, largura, 0, altura passa pelo json
+    // 0, coluna, 0, linha passa pelo json
 
           //desenhando o fundo
     for (let x = x1 ; x < x2; x++){      //percorre as largura 
@@ -21,46 +22,49 @@ function drawBackground(background, context, sprites){
 }         
 
 
-function loadMauroSprites(){
-    
-   return loadImage('/img/sprites.png').then(image =>{ //enviando a imagem para promise
-    const sprites = new SpriteSheet(image,16,16)
-
-    //definindo as sprites
-    sprites.define('idle',0,88,14,16) // sprite mauro parado
-
-    return sprites; //retornando a instancia de sprites
-   })
-}
-
-
-function loadBackgroundSprites(){
-    
-   return loadImage('/img/tiles.png').then(image =>{ //enviando a imagem para promise
-    const sprites = new SpriteSheet(image,16,16)
-
-    //definindo as sprites
-    sprites.defineTile('ground',0,0) // nome do sprite posicao x no tile e altura y no tile
-    sprites.defineTile("sky",3,23)
-
-    return sprites; //retornando a instancia de sprites
-   })
-}
     const canvas = document.getElementById('screen'); //pegando o canva no html
     const context = canvas.getContext('2d'); //criando contexto para que possa ser desenho
 
-   Promise.all([ //carrega as duas coisas em pararelo
+
+    //compositor: lista de camadas - guarda uma lista de funcoes e chama em ordem\
+
+
+   
+    function createSpriteLayer(sprite,pos){ // (nomeSprite, posicao)
+        return function drawSpritesLayer(context){ //canva a ser desenhado
+            for(let i = 0; i <20; i++){
+            sprite.draw('idle',context,pos.x + i * 16 ,pos.y)  //nomeSprite, canva posicao x, posicao y)
+            }
+        }
+    }
+
+   Promise.all([ //carrega as tres coisas em pararelo
     loadMauroSprites(),
     loadBackgroundSprites(),
     loadLevel('1-1')])
 
-    .then(([mauroSprite,sprites,level]) => { //roda quando termina de carregar
-      console.log("nivel 1")
-        level.backgrounds.forEach(background => { 
+    .then(([mauroSprite,backgroundSprites,level]) => { //roda quando termina de carregar
+        const comp = new Compositor()
+        const backgroundLayer = createBackgroundLayer(level.backgrounds,backgroundSprites)//criando um background layer
+        comp.layers.push(backgroundLayer); //inserindo a layer no array de camadas
+        
+        const pos = {
+            x: 0,
+            y: 0,
+        };
 
-            drawBackground(background, context, sprites)
-        });
-        mauroSprite.draw('idle',context,64,64)
+        const spriteLayer = createSpriteLayer(mauroSprite,pos) //criando a layer do mauro
+        comp.layers.push(spriteLayer) //inserindo a layer no array
+
+        function update(){ //loop de animacao
+            comp.draw(context);
+           
+            
+            pos.x += 2
+            pos.y += 2
+            requestAnimationFrame(update);
+        }
+        update()
    } )
 
 
