@@ -1,8 +1,10 @@
-function drawBackground(background, context, sprites){
+
+//desenha o fundo
+function drawBackground(background, context, sprites){ //fundo, canva e sprite a ser desenhado
 
     //percorrendo os intervalos pra preencher o fundo
     background.ranges.forEach(([x1, x2, y1, y2]) => {
-    // 0, coluna, 0, linha passa pelo json
+    // (0, coluna, 0, linha) passada pelo json
 
           //desenhando o fundo
     for (let x = x1 ; x < x2; x++){      //percorre as largura 
@@ -29,3 +31,10 @@ export function createBackgroundLayer(backgrounds,sprites){
          context.drawImage(buffer,0,0)
     };
 }
+//cria uma layer de entidade
+export function createSpriteLayer(entity) { //chama o draw da entidade
+    return function drawSpritesLayer(context) { //canva a ser desenhado
+        entity.draw(context)
+        
+    }
+} 
