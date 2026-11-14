@@ -36,20 +36,36 @@ Promise.all([ //carrega as tres coisas em pararelo
     .then(([mauro, backgroundSprites, level]) => { //roda quando termina de carregar
         const comp = new Compositor()
         const backgroundLayer = createBackgroundLayer(level.backgrounds, backgroundSprites)//criando um background layer
-        comp.layers.push(backgroundLayer); //inserindo a layer no array de camadas(camada 1)
+        //comp.layers.push(backgroundLayer); //inserindo a layer no array de camadas(camada 1)
 
-        const gravity = 0.5
+        const gravity = 30
+        mauro.pos.set(64,180)
+        mauro.vel.set(200,-600)
         
         const spriteLayer = createSpriteLayer(mauro) //criando a layer do mauro
         comp.layers.push(spriteLayer) //inserindo a layer no array (camada 2)
 
-        function update() { //loop de animacao
+        const deltaTime = 1/60
+        let accumulatedTime = 0
+        let lastTime = 0 
+
+        function update(time) { //loop de animacao
+            accumulatedTime = (time - lastTime) / 1000
+            console.log(accumulatedTime)
+            
+            while(accumulatedTime > deltaTime){ //se 16 ms
             comp.draw(context); //desenha as camadas
-            mauro.update() //move o mauro
+            mauro.update(deltaTime) //move o mauro
             mauro.vel.y += gravity
-            requestAnimationFrame(update);
+            //requestAnimationFrame(update);
+
+            accumulatedTime -= deltaTime //
+            }
+            
+            setTimeout(update, 1000/5000,performance.now())
+            lastTime = time
         }
-        update()
+        update(0)
     })
 
 
