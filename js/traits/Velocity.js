@@ -1,4 +1,6 @@
 import { Trait } from "../entity.js"
+
+
 export default class Velocity extends Trait{ //herdando a classe Trait
     constructor(){
         super('velocity')

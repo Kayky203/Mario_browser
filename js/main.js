@@ -29,8 +29,6 @@ function drawBackground(background, context, sprites) {
 const canvas = document.getElementById('screen'); //pegando o canva no html
 const context = canvas.getContext('2d'); //criando contexto para que possa ser desenho
 
-
-
 Promise.all([ //carrega as tres coisas em pararelo
     createMauro(),
     loadBackgroundSprites(),

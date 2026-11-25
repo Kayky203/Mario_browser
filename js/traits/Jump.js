@@ -10,6 +10,9 @@ export default class Jump extends Trait{ //herdando a classe Trait
     start(){
         this.engageTime = this.duration
     }
+    cancel(){
+        this.engageTime = 0
+    }
     update(entity,deltaTime){
         
       if (this.engageTime >0 ){
