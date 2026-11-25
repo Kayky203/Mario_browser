@@ -1,9 +1,12 @@
 import { loadLevel } from "./loaders.js"
+import Timer from "./Timer.js";
 import {loadBackgroundSprites } from "./sprites.js";
 import Compositor from "./Compositor.js";
 import { createBackgroundLayer, createSpriteLayer } from "./layers.js";
 import entity from "./entity.js";
 import { createMauro } from "./entities.js";
+import Keyboard from "./keyboardState.js";
+
 
 //pega o fundo de um json e desenha no canva
 function drawBackground(background, context, sprites) {
@@ -36,36 +39,39 @@ Promise.all([ //carrega as tres coisas em pararelo
     .then(([mauro, backgroundSprites, level]) => { //roda quando termina de carregar
         const comp = new Compositor()
         const backgroundLayer = createBackgroundLayer(level.backgrounds, backgroundSprites)//criando um background layer
-        //comp.layers.push(backgroundLayer); //inserindo a layer no array de camadas(camada 1)
+        comp.layers.push(backgroundLayer); //inserindo a layer no array de camadas(camada 1)
 
-        const gravity = 30
+
+        const gravity = 2000
         mauro.pos.set(64,180)
         mauro.vel.set(200,-600)
+
+        const SPACE = 32
+        const input = new Keyboard()
+        input.addMapping(SPACE,keyState =>{
+            if (keyState){
+                mauro.jump.start()
+            } else{
+                mauro.jump.cancel()
+            }
+        })
+        input.listenTo(window)
+        console.log
         
         const spriteLayer = createSpriteLayer(mauro) //criando a layer do mauro
         comp.layers.push(spriteLayer) //inserindo a layer no array (camada 2)
 
-        const deltaTime = 1/60
-        let accumulatedTime = 0
-        let lastTime = 0 
+        const timer = new Timer(1/60) 
 
-        function update(time) { //loop de animacao
-            accumulatedTime = (time - lastTime) / 1000
-            console.log(accumulatedTime)
-            
-            while(accumulatedTime > deltaTime){ //se 16 ms
-            comp.draw(context); //desenha as camadas
+        timer.update = function update(deltaTime) { //loop de animacao
+
+           
             mauro.update(deltaTime) //move o mauro
-            mauro.vel.y += gravity
+            comp.draw(context); //desenha as camadas
+            mauro.vel.y += gravity * deltaTime
             //requestAnimationFrame(update);
-
-            accumulatedTime -= deltaTime //
-            }
-            
-            setTimeout(update, 1000/5000,performance.now())
-            lastTime = time
         }
-        update(0)
+        timer.start()
     })
 
 
